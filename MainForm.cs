@@ -33,6 +33,7 @@ internal sealed class MainForm : Form
     private bool _isCapturing;
     private bool _isInjecting;
     private bool _isRefreshingGrid;
+    private bool _settingsLoaded;
     private bool _allowExit;
     private bool _trayHintShown;
 
@@ -63,12 +64,14 @@ internal sealed class MainForm : Form
             var result = await _settingsStore.LoadAsync(_lifetimeCancellation.Token);
             if (!result.IsSuccess || result.Value is null)
             {
+                _settingsLoaded = true;
                 SetStatus(result.Error ?? "Не удалось загрузить настройки.", isError: true);
                 RefreshSavedGrid();
                 return;
             }
 
             _settings = result.Value;
+            _settingsLoaded = true;
             RegisterAllHotkeys();
             RefreshSavedGrid();
             ShowRegistrationSummary();
@@ -77,6 +80,26 @@ internal sealed class MainForm : Form
         {
             // The application is closing.
         }
+    }
+
+    protected override void OnHandleCreated(EventArgs eventArgs)
+    {
+        base.OnHandleCreated(eventArgs);
+
+        if (!_settingsLoaded || _isCapturing || _allowExit)
+        {
+            return;
+        }
+
+        RegisterAllHotkeys();
+        RefreshSavedGrid(_editingId);
+        ShowRegistrationSummary();
+    }
+
+    protected override void OnHandleDestroyed(EventArgs eventArgs)
+    {
+        UnregisterAllHotkeys();
+        base.OnHandleDestroyed(eventArgs);
     }
 
     protected override void OnResize(EventArgs eventArgs)
@@ -750,7 +773,6 @@ internal sealed class MainForm : Form
     private void HideToTray()
     {
         EndHotkeyCapture();
-        ShowInTaskbar = false;
         Hide();
 
         if (_trayHintShown)
@@ -768,7 +790,6 @@ internal sealed class MainForm : Form
 
     private void RestoreFromTray()
     {
-        ShowInTaskbar = true;
         Show();
         WindowState = FormWindowState.Normal;
         Activate();
