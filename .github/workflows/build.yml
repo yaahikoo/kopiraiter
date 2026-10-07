@@ -1,0 +1,48 @@
+name: Build Windows app
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore Kopiraiter.csproj
+
+      - name: Build
+        run: dotnet build Kopiraiter.csproj --configuration Release --no-restore
+
+      - name: Publish single-file application
+        run: >-
+          dotnet publish Kopiraiter.csproj
+          --configuration Release
+          --runtime win-x64
+          --self-contained true
+          --output publish/win-x64
+          -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:DebugType=None
+          -p:DebugSymbols=false
+
+      - name: Upload Windows executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: Kopiraiter-win-x64
+          path: publish/win-x64/Kopiraiter.exe
+          if-no-files-found: error
