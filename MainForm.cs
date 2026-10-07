@@ -23,6 +23,7 @@ internal sealed class MainForm : Form
     private readonly DataGridView _savedGrid = new();
     private readonly Label _savedLabel = new();
     private readonly Label _statusLabel = new();
+    private readonly Label _versionLabel = new();
     private readonly NotifyIcon _trayIcon;
 
     private AppSettings _settings = new();
@@ -215,7 +216,30 @@ internal sealed class MainForm : Form
         _statusLabel.AutoSize = true;
         _statusLabel.Dock = DockStyle.Fill;
         _statusLabel.Text = "Загрузка…";
-        _statusLabel.Margin = new Padding(0, 10, 0, 0);
+        _statusLabel.Margin = new Padding(0);
+
+        var assemblyVersion = typeof(MainForm).Assembly.GetName().Version;
+        _versionLabel.AutoSize = true;
+        _versionLabel.Anchor = AnchorStyles.Right;
+        _versionLabel.ForeColor = SystemColors.GrayText;
+        _versionLabel.Text = assemblyVersion is null
+            ? string.Empty
+            : $"Версия {assemblyVersion.Major}.{assemblyVersion.Minor}.{assemblyVersion.Build}";
+        _versionLabel.Margin = new Padding(16, 0, 0, 0);
+
+        var statusPanel = new TableLayoutPanel
+        {
+            AutoSize = true,
+            AutoSizeMode = AutoSizeMode.GrowAndShrink,
+            Dock = DockStyle.Fill,
+            ColumnCount = 2,
+            RowCount = 1,
+            Margin = new Padding(0, 10, 0, 0)
+        };
+        statusPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        statusPanel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        statusPanel.Controls.Add(_statusLabel, 0, 0);
+        statusPanel.Controls.Add(_versionLabel, 1, 0);
 
         layout.Controls.Add(title);
         layout.Controls.Add(description);
@@ -226,7 +250,7 @@ internal sealed class MainForm : Form
         layout.Controls.Add(buttonPanel);
         layout.Controls.Add(_savedLabel);
         layout.Controls.Add(_savedGrid);
-        layout.Controls.Add(_statusLabel);
+        layout.Controls.Add(statusPanel);
 
         Controls.Add(layout);
         AcceptButton = _saveButton;

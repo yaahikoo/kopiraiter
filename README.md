@@ -28,3 +28,5 @@
 Готовый автономный файл будет создан в `publish\win-x64\Kopiraiter.exe`. Устанавливать .NET на целевой компьютер не нужно.
 
 GitHub Actions также собирает `Kopiraiter-win-x64` при каждом push в `main`; файл можно скачать из раздела **Actions → Build Windows app → Artifacts**.
+
+На странице Releases публикуется готовый `Kopiraiter.exe` без дополнительного ZIP-архива.
