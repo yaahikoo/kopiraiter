@@ -12,6 +12,7 @@
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
     <AssemblyName>Kopiraiter</AssemblyName>
     <RootNamespace>Kopiraiter</RootNamespace>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
 </Project>

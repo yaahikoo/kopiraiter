@@ -12,7 +12,7 @@ internal static class Program
         if (!isFirstInstance)
         {
             MessageBox.Show(
-                "Приложение «Копирайтер» уже запущено.",
+                "Приложение «Копирайтер» уже запущено. Найдите его значок в системном трее.",
                 "Копирайтер",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
